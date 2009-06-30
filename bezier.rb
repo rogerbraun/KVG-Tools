@@ -53,13 +53,13 @@ class SVG_C
   end   
   
   def to_SEXP
-    sexp = "("
-    make_curvepoint_array(20).each { |point|
+    sexp = ""
+    distance = Math.sqrt(((@x0 - @x3)**2) + ((@y0 - @y3)**2)).ceil
+    make_curvepoint_array((distance/2)).each { |point|
       
       sexp += "(" + (point["x"].round.to_s) + " " + (point["y"].round.to_s) + ")";
     
     }    
-    sexp += ")"
     return sexp
   end 
    
@@ -102,7 +102,7 @@ class SVG_M
 
 
   def to_SEXP
-    return "((" + (@x.round.to_s) + " " + (@y.round.to_s) +"))"
+    return "(" + (@x.round.to_s) + " " + (@y.round.to_s) +")"
   end
   
   def to_s
@@ -185,7 +185,7 @@ class SVG_Code
   
   def parse_stroke(stroke)
  
-    elements = stroke.gsub("-",",-").gsub("c",",c,").gsub("C","C,").gsub("M","M,").gsub("[","").gsub(";",",;,").gsub(",,",",").split(/,/);
+    elements = stroke.gsub("-",",-").gsub("c",",c,").gsub("C",",C,").gsub("M","M,").gsub("[","").gsub(";",",;,").gsub(",,",",").split(/,/);
     
     type = "N"
     position = 0;
@@ -245,6 +245,7 @@ class SVG_Code
   
   def to_s
       sexp = @svg_rep.map { |element|
+      
       element.map{ |element2|
         if element2 != nil
           element2.to_s
@@ -257,11 +258,11 @@ class SVG_Code
     
   def to_SEXP
     sexp = @svg_rep.map { |element|
-      element.map{ |element2|
+      "(" + element.map{ |element2|
         if element2 != nil
           element2.to_SEXP
         end  
-        }
+        }.join(" ") + ")\n"
     }
     return sexp.join(" ");
   end  
@@ -275,13 +276,16 @@ saru = SVG_Code.new("M37.82,14.75c0.11,0.93-0.05,1.89-0.61,2.65c-5.23,6.98-10.65
 
 #svg.print_split;
 
-#saru.print_split;
+saru.print_split;
 #print saru.to_s;
 #saru.print_strokes;
 
 print saru.to_SEXP
 
-c = SVG_C.new(100,200,100,100,250,100,250,200);
+lalala = SVG_Code.new("M13.03,37.07c0.35,0.2,2.45,0.33,3.39,0.26c4.05-0.33,16.54-1.79,23.04-2.77c0.94-0.14,2.21-0.2,2.8,0;M29.36,14c0.91,0.47,2.04,1.5,2.04,4.42c0,0.95-0.12,72.25-0.3,78.08;M30.94,38.28c-6.23,16.34-9.69,23.25-19.33,37.56;M32.97,44.9c2.37,1.59,5.28,5.76,7.28,8.85;[,M66.54,12.25c0.61,0.47,1.61,2.29,1.61,3.22c0,3.45-0.19,6.54-0.08,9.46;M44.82,26.63c1.06,0.1,3.46,0.64,4.49,0.56c10.84-0.82,30.17-3.88,41.45-4.18,c1.74-0.05,2.63,0.05,3.93,0.71;[,M55.28,33.67c0.41,0.27,0.84,0.49,1.02,0.82c1.43,2.63,1.63,9.89,2.61,14.61;M56.87,35.36c8.63-1.52,18.37-3.2,23.31-3.59c1.81-0.14,2.89,1.74,2.64,2.56,c-1.07,3.41-1.55,5.7-3.14,10.4;M58.93,47.6c5.73-0.36,15.16-1.73,23.02-2.28;[,M48.25,56.77c0.47,1.16,1.27,2.05,1.27,4.15c0,5.84-0.2,26.34-0.2,34.59;M49.93,59.55c6.42-0.46,37.4-3.76,38.58-4.04c2.92-0.7,4.06,1.46,4.06,4.7,c0,10.28-0.32,18.53-1.07,28.87c-0.65,8.89-5,3.67-6.9,1.5;[,M59.06,67.7c0.25,0.29,0.5,0.53,0.61,0.89c0.86,2.87,1.89,9.76,2.48,14.9;M60.61,69.14C67.5,67.5,72,67,75.62,66.62c1.19-0.13,2.31,1.18,2.2,2.56c-0.29,3.44-1.37,5.45-2.3,10.08,;M62.27,81.48c4.98,0,11.23-0.81,14.81-0.81;
+")
+
+print lalala.to_SEXP
 #print c.to_s
 #print svg.to_SEXP
 #rint svg.to_s
