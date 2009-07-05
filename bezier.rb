@@ -280,8 +280,19 @@ class SVG_Code
   end
 end  
 
-class SVG_S < SVG_C
 
+# SVG_S is a representation of the s or S element of SVG.
+# The SVG syntax is as follows:
+# s x2 y2 x y
+# If s is capitalized, coordinates are given in absolutes, else they are relative.
+# It draws a cubic Bézier curve from the current point to the point (x,y). (x2,y2)
+# is the second control point. The first control point is a reflection of the second
+# control point of the prevoius command. 
+class SVG_S < SVG_C
+  def initialization(x2, y2, x, y, current_x, current_y)
+    control_1 = reflect({:x => x2, :y =>y2},{:x => current_x, :y => current_y})
+    super(current_x,current_y,control_1[:x],control_1[:y],x2,y2,x,y)
+  end
 end
 
 # reflect reflektiert einen Punkt point an einem Spiegelpunkt mirror und gibt den reflektierten Punkt zurück.
