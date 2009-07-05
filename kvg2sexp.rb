@@ -53,7 +53,7 @@ class SVG_M
   
 end
 
-# SVG_C represents the moveto command. 
+# SVG_C represents the cubic Bézier curveto command. 
 # Syntax is:
 # c x1 y1 x2 y2 x y
 # It sets the current cursor to the point (x,y).
@@ -119,9 +119,38 @@ class SVG_C
     return curve_array.inject("") {|result, element|
         result + element.to_sexp
       }
-  end     
+  end
+  
+  def to_points
+      return make_curvepoint_array(20)
+  end
+  
 
 end
+
+# SVG_S represents the smooth curveto command. 
+# Syntax is:
+# s x2 y2 x y
+# It sets the current cursor to the point (x,y).
+# As always, capitalization denotes absolute values.
+# Takes 3 Points as argument, the third being the current cursor
+# If constructed using SVG_S.relative, the current cursor is added to every
+# point.
+class SVG_S < SVG_C       
+
+  def initialize(c2, p, current_cursor)
+    super(reflect(c2,current_cursor), c2, p, current_cursor)
+  end
+  
+  def SVG_S.relative(c2, p, current_cursor)
+    SVG_C.relative(reflect(c2,current_cursor), c2, p, current_cursor)
+  end
+  
+  def reflect(p, mirror)
+    return mirror + (mirror - p)
+  end
+  
+end  
 
   
   
