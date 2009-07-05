@@ -36,7 +36,10 @@ p3 = Point.new(70,80)
 
 curve = SVG_C.new(p2,p3,p4,p1)
 
-draw_to_context(cr,curve.to_points)
+s = Stroke.new("M10.25,33.29c0.37,0.51,0.76,0.94,0.92,1.58c1.29,5.07,3.34,18.54,4.23,27.63")
+
+
+draw_to_context(cr,s.to_points)
 
 
 cr.target.write_to_png("test.png")

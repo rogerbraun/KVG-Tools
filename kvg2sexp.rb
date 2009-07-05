@@ -47,6 +47,10 @@ class SVG_M
     return ""
   end
   
+  def to_points
+    return []
+  end
+  
   def current_cursor
     return @p
   end
@@ -75,10 +79,7 @@ class SVG_C
   # http://www.cubic.org/docs/bezier.htm
   # Takes 2 Points and a factor between 0 and 1
   def linear_interpolation(a,b,factor)
-   if factor > 1
-     #This should never happen
-     print "Error: Factor > 1";
-   end
+  
    xr = a.x + ((b.x - a.x) * factor)
    yr = a.y + ((b.y - a.y) * factor)
      
@@ -122,7 +123,11 @@ class SVG_C
   end
   
   def to_points
-      return make_curvepoint_array(20)
+    return make_curvepoint_array(20)
+  end
+  
+  def current_cursor
+    @p
   end
   
 
@@ -150,7 +155,105 @@ class SVG_S < SVG_C
     return mirror + (mirror - p)
   end
   
-end  
+end 
+
+
+# Stroke represent one stroke, which is a series of SVG commands.
+class Stroke
+
+  def initialize(stroke_as_code)
+    @command_list = parse(stroke_as_code) 
+  end
+  
+  def to_sexp
+    return "( " + @command_list.inject("") {|result,element| result + element.to_sexp} + ")"
+  end
+  
+  def to_points
+    return @command_list.map{|element| element.to_points}.flatten
+  end
+  
+  def split_elements(line)
+    # This is magic.
+    return line.gsub("-",",-").gsub("c",",c,").gsub("C",",C,").gsub("M","M,").gsub("[","").gsub(";",",;,").gsub(",,",",").split(/,/);
+  end
+  
+  def parse(stroke_as_code)
+    elements = split_elements(stroke_as_code)
+    print elements
+    
+    command_list = Array.new
+    current_cursor = Point.new(0,0);
+    
+    while elements != [] do
+
+      case elements.slice!(0)
+        when "M"
+          x,y = elements.slice!(0..1)
+          m = SVG_M.new(Point.new(x.to_f,y.to_f))
+          current_cursor = m.current_cursor
+          command_list.push(m)
+          
+        when "C"
+          x1,y1,x2,y1,x,y = elements.slice!(0..5)
+          c = SVG_C.new(Point.new(x1.to_f,y1.to_f), Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor)
+          current_cursor = c.current_cursor
+          command_list.push(c)    
+          
+        when "c"
+          x1,y1,x2,y2,x,y = elements.slice!(0..5)
+          c = SVG_C.relative(Point.new(x1.to_f,y1.to_f), Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor)
+          current_cursor = c.current_cursor      
+          command_list.push(c)     
+           
+        when "s"
+          x2,y2,x,y = elements.slice!(0..3)
+          s = SVG_S.relative(Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor)
+          current_cursor = s.current_cursor
+          command_list.push(s)                
+          
+        when "S"        
+          x2,y2,x,y = elements.slice!(0..3)
+          s = SVG_S.relative(Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor)
+          current_cursor = s.current_cursor
+          command_list.push(s)  
+              
+        else 
+          print "You should not be here\n"
+      
+      end
+      
+    end
+    
+    return command_list  
+                         
+  end
+
+end
+
+# SVG_Character represents a whole character. It takes one argument, which
+# is a string of one line of kanjisstrokes.txt, or at least a line in that
+# format.
+# The format is like this:
+# Strokes are split by a ;
+# The first character is the kanji, followed by a whitespace
+#   
+class SVG_Character
+    
+  def initialize(line)
+    # Splits the line into the kanji character, which is then put into 
+    # @character and the rest of the line.
+    @character,rest = line.split(" ");
+    @strokes = split_strokes(rest).map {|stroke| Stroke.new(stroke)}
+  end
+    
+  def split_strokes(line)
+    return line.split(";")
+  end
+    
+  
+
+end 
 
   
   
