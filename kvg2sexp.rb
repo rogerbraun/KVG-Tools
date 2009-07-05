@@ -1,7 +1,4 @@
 # kvg2sexp.rb
-# Takes as first argument the kanjistrokes.txt file you can find in the tagaini
-# jisho svn. If given a second argument, it outputs the training data in 
-# S-expression format to the file specified there. If not, it just prints it.
 
 
 #A Point
