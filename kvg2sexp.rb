@@ -141,6 +141,7 @@ end
 # Takes 3 Points as argument, the third being the current cursor
 # If constructed using SVG_S.relative, the current cursor is added to every
 # point.
+# I think there is still a bug in this. 直 does not render right.
 class SVG_S < SVG_C       
 
   def initialize(c2, p, current_cursor)
@@ -148,10 +149,10 @@ class SVG_S < SVG_C
   end
   
   def SVG_S.relative(c2, p, current_cursor)
-    SVG_C.relative(reflect(c2,current_cursor), c2, p, current_cursor)
+    SVG_C.relative(SVG_S.reflect(c2,current_cursor), c2, p, current_cursor)
   end
   
-  def reflect(p, mirror)
+  def SVG_S.reflect(p, mirror)
     return mirror + (mirror - p)
   end
   
@@ -179,9 +180,7 @@ class Stroke
   end
   
   def parse(stroke_as_code)
-    elements = split_elements(stroke_as_code)
-    print elements
-    
+    elements = split_elements(stroke_as_code)    
     command_list = Array.new
     current_cursor = Point.new(0,0);
     
@@ -195,7 +194,7 @@ class Stroke
           command_list.push(m)
           
         when "C"
-          x1,y1,x2,y1,x,y = elements.slice!(0..5)
+          x1,y1,x2,y2,x,y = elements.slice!(0..5)
           c = SVG_C.new(Point.new(x1.to_f,y1.to_f), Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor)
           current_cursor = c.current_cursor
           command_list.push(c)    
@@ -219,7 +218,7 @@ class Stroke
           command_list.push(s)  
               
         else 
-          print "You should not be here\n"
+          #print "You should not be here\n"
       
       end
       
@@ -249,6 +248,18 @@ class SVG_Character
     
   def split_strokes(line)
     return line.split(";")
+  end
+  
+  def to_sexp
+    c = "(character (value " + @character +") (width 109) (height 109) (strokes "
+    c = @strokes.inject(c) {|result, stroke| result + stroke.to_sexp}
+    c += ") )"    
+    return c
+  
+  end
+  
+  def to_points
+    return @strokes.map {|stroke| stroke.to_points}.flatten
   end
     
   
