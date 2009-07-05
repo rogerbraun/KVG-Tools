@@ -280,6 +280,17 @@ class SVG_Code
   end
 end  
 
+class SVG_S < SVG_C
+
+end
+
+# reflect reflektiert einen Punkt point an einem Spiegelpunkt mirror und gibt den reflektierten Punkt zurück.
+def reflect(point, mirror)
+  xd = mirror[:x] - point[:x]
+  yd = mirror[:y] - point[:y]
+  return {:x => xd+mirror[:x], :y =>yd+mirror[:y]}
+end
+
 
 =begin lines = IO.read("kanjisstrokes.txt").split("\n")
 lines.each do |line|
