@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # kvg2sexp.rb
 
 
@@ -22,7 +23,10 @@ class Point
   def -(p2)
     return Point.new(@x - p2.x, @y - p2.y)
   end      
-  
+
+  def dist(p2)
+    return Math.sqrt((p2.x - @x)**2 + (p2.y - @y)**2)
+  end
 end  
 
 
@@ -93,12 +97,27 @@ class SVG_C
     bccd = linear_interpolation(bc,cd,factor)
     return linear_interpolation(abbc,bccd,factor)    
   end    
+
+  def length(points)
+    old_point = @current_cursor;
+    length = 0.0
+    factor = points.to_f
+    
+    (1..points).each {|point|
+      new_point = make_curvepoint(point/(factor.to_f))
+      length += old_point.dist(new_point)
+      old_point = new_point
+    }
+    return length
+  end
   
   # This gives back an array of points on the curve. The argument given
   # denotes how many points are calculated
   def make_curvepoint_array(points)
     result = Array.new
     
+    l = length(points)
+    points = l * 0.3
     factor = points.to_f
     
     (0..points).each {|point|
@@ -115,8 +134,8 @@ class SVG_C
     
     # Why did they call "fold" inject? It's still fold.
     return curve_array.inject("") {|result, element|
-        result + element.to_sexp
-      }
+      result + element.to_sexp
+    }
   end
   
   def to_points
