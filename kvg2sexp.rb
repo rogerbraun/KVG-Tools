@@ -27,6 +27,10 @@ class Point
   def dist(p2)
     return Math.sqrt((p2.x - @x)**2 + (p2.y - @y)**2)
   end
+  
+  def *(number)
+    return Point.new(@x * number, @y * number)
+  end
 end  
 
 
@@ -169,7 +173,9 @@ class SVG_S < SVG_C
   end
   
   def SVG_S.reflect(p, mirror)
-    return mirror + (mirror - p)
+    #return mirror + (mirror - p)
+    #return (mirror - p) * 2
+    return (p * 2) - mirror
   end
   
 end 
