@@ -112,12 +112,12 @@ class SVG_C
   end
   
   # This gives back an array of points on the curve. The argument given
-  # denotes how many points are calculated
-  def make_curvepoint_array(points)
+  # denotes how the distance between each point.
+  def make_curvepoint_array(distance)
     result = Array.new
     
-    l = length(points)
-    points = l * 0.3
+    l = length(20)
+    points = l * distance
     factor = points.to_f
     
     (0..points).each {|point|
@@ -130,7 +130,7 @@ class SVG_C
   
   # This calculates 20 points on a curve and puts them out as a string
   def to_sexp
-    curve_array = make_curvepoint_array(20)
+    curve_array = to_points
     
     # Why did they call "fold" inject? It's still fold.
     return curve_array.inject("") {|result, element|
@@ -139,7 +139,7 @@ class SVG_C
   end
   
   def to_points
-    return make_curvepoint_array(20)
+    return make_curvepoint_array(0.3)
   end
   
   def current_cursor
