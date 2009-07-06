@@ -80,6 +80,10 @@ class SVG_C
     SVG_C.new(c1 + current_cursor, c2 + current_cursor, p + current_cursor, current_cursor)
   end
   
+  def second_point
+    @c2
+  end
+  
   # This implements the algorithm found here:
   # http://www.cubic.org/docs/bezier.htm
   # Takes 2 Points and a factor between 0 and 1
@@ -164,12 +168,12 @@ end
 # I think there is still a bug in this. 直 does not render right.
 class SVG_S < SVG_C       
 
-  def initialize(c2, p, current_cursor)
-    super(reflect(c2,current_cursor), c2, p, current_cursor)
+  def initialize(c2, p, current_cursor,previous_point)
+    super(SVG_S.reflect(previous_point,current_cursor), c2, p, current_cursor)
   end
   
-  def SVG_S.relative(c2, p, current_cursor)
-    SVG_C.relative(SVG_S.reflect(c2,current_cursor), c2, p, current_cursor)
+  def SVG_S.relative(c2, p, current_cursor, previous_point)
+    SVG_C.relative(SVG_S.reflect(previous_point,current_cursor), c2, p, current_cursor)
   end
   
   def SVG_S.reflect(p, mirror)
@@ -229,13 +233,15 @@ class Stroke
            
         when "s"
           x2,y2,x,y = elements.slice!(0..3)
-          s = SVG_S.relative(Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor)
+          p1 = command_list[-1].second_point
+          s = SVG_S.relative(Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor, p1)
           current_cursor = s.current_cursor
           command_list.push(s)                
           
         when "S"        
           x2,y2,x,y = elements.slice!(0..3)
-          s = SVG_S.relative(Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor)
+          p1 = command_list[-1].second_point
+          s = SVG_S.new(Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor,p1)
           current_cursor = s.current_cursor
           command_list.push(s)  
               
