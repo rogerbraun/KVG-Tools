@@ -192,7 +192,7 @@ class Stroke
   
   def split_elements(line)
     # This is magic.
-    return line.gsub("-",",-").gsub("c",",c,").gsub("C",",C,").gsub("M","M,").gsub("[","").gsub(";",",;,").gsub(",,",",").split(/,/);
+    return line.gsub("-",",-").gsub("s",",s,").gsub("S",",S,").gsub("c",",c,").gsub("C",",C,").gsub("M","M,").gsub("[","").gsub(";",",;,").gsub(",,",",").split(/,/);
   end
   
   def parse(stroke_as_code)
