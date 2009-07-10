@@ -31,6 +31,10 @@ class Point
   def *(number)
     return Point.new(@x * number, @y * number)
   end
+  
+  def to_s
+    "x:" + @x.to_s + " y:" + @y.to_s + "\n"
+  end
 end  
 
 
@@ -158,12 +162,7 @@ class SVG_C
   end
   
   def to_points
-    @c1.color = @@c_color
-    @c2.color = @@c_color
-    switch_color
-    @current_cursor.color = :blue
-    @p.color = :blue
-    return make_curvepoint_array(0.3).push(@c1).push(@c2).push(@p).push(@current_cursor)
+    return make_curvepoint_array(0.3)
   end
   
   def current_cursor
@@ -181,15 +180,21 @@ end
 # Takes 3 Points as argument, the third being the current cursor
 # If constructed using SVG_S.relative, the current cursor is added to every
 # point.
-# I think there is still a bug in this. 直 does not render right.
 class SVG_S < SVG_C       
 
   def initialize(c2, p, current_cursor,previous_point)
     super(SVG_S.reflect(previous_point,current_cursor), c2, p, current_cursor)
   end
   
+  # The reflection in this case is rather tricky. Using SVG_C.relative, the
+  # offset of current_cursor is added to all the positions (except current_cursor).
+  # The reflected point, however is already calculated in absolute values.
+  # Because of this, we have to subtract the current_cursor from the reflected 
+  # point, as it is already added later. I think I got the classes somewhat wrong.
+  # Maybe points should get a field whether they are absolute oder relative?
+  # Don't know yet. It works now, though!
   def SVG_S.relative(c2, p, current_cursor, previous_point)
-    SVG_C.relative(SVG_S.reflect(previous_point,current_cursor), c2, p, current_cursor)
+    SVG_C.relative(SVG_S.reflect(previous_point,current_cursor) - current_cursor, c2, p, current_cursor)
   end
   
   def SVG_S.reflect(p, mirror)
@@ -247,15 +252,15 @@ class Stroke
            
         when "s"
           x2,y2,x,y = elements.slice!(0..3)
-          p1 = command_list[-1].second_point
-          s = SVG_S.relative(Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor, p1)
+          reflected_point = command_list[-1].second_point
+          s = SVG_S.relative(Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor, reflected_point)
           current_cursor = s.current_cursor
           command_list.push(s)                
           
         when "S"        
           x2,y2,x,y = elements.slice!(0..3)
-          p1 = command_list[-1].second_point
-          s = SVG_S.new(Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor,p1)
+          reflected_point = command_list[-1].second_point
+          s = SVG_S.new(Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor,reflected_point)
           current_cursor = s.current_cursor
           command_list.push(s)  
               
