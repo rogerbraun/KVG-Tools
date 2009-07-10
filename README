@@ -1,0 +1,13 @@
+kvg-tools
+=========
+
+These are tools for converting the KanjiVG data at kanjivg.tagaini.net to points
+and strokes. Right now it only converts to pointy images in png and to 
+S-Expressions. These can be used to train zinnia (http://zinnia.sourceforge.net/)
+models.
+
+License
+-------
+
+This package is distributed under the terms of the GNU General Public
+License.
