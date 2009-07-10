@@ -5,10 +5,10 @@
 #A Point
 class Point
   
-  attr_accessor :x, :y
+  attr_accessor :x, :y, :color
   
-  def initialize(x,y)
-    @x,@y = x, y
+  def initialize(x,y, color = :black)
+    @x,@y, @color = x, y, color
   end
   
   def to_sexp
@@ -74,6 +74,7 @@ class SVG_C
 
   def initialize(c1,c2,p,current_cursor)
     @c1,@c2,@p,@current_cursor = c1,c2,p,current_cursor
+    @@c_color = :green
   end
   
   def SVG_C.relative(c1,c2,p,current_cursor)
@@ -95,6 +96,16 @@ class SVG_C
    return Point.new(xr,yr);
    
   end 
+  
+  def switch_color
+    if @@c_color == :green
+      @@c_color = :red
+    elsif @@c_color == :red
+      @@c_color = :purple
+    else
+      @@c_color = :green
+    end  
+  end
   
   def make_curvepoint(factor)
     ab = linear_interpolation(@current_cursor,@c1,factor)
@@ -147,7 +158,12 @@ class SVG_C
   end
   
   def to_points
-    return make_curvepoint_array(0.3)
+    @c1.color = @@c_color
+    @c2.color = @@c_color
+    switch_color
+    @current_cursor.color = :blue
+    @p.color = :blue
+    return make_curvepoint_array(0.3).push(@c1).push(@c2).push(@p).push(@current_cursor)
   end
   
   def current_cursor
@@ -177,9 +193,7 @@ class SVG_S < SVG_C
   end
   
   def SVG_S.reflect(p, mirror)
-    #return mirror + (mirror - p)
-    #return (mirror - p) * 2
-    return (p * 2) - mirror
+    return mirror + (mirror - p)
   end
   
 end 
