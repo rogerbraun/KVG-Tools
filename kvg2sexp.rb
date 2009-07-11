@@ -35,6 +35,12 @@ class Point
   def to_s
     "x:" + @x.to_s + " y:" + @y.to_s + "\n"
   end
+  
+  
+  
+  def to_xml
+    "<point x=\"" + (@x * 1000 / 109).to_s + "\" y=\"" + (@y * 1000 / 109).to_s + "\"/>"  
+  end
 end  
 
 
@@ -62,6 +68,10 @@ class SVG_M
   
   def current_cursor
     return @p
+  end
+  
+  def to_xml
+    ""
   end
   
 end
@@ -161,6 +171,15 @@ class SVG_C
     }
   end
   
+  def to_xml
+    curve_array = to_points
+    
+    return curve_array.inject("") {|result, element|
+      result + "\t" + element.to_xml + "\n"
+    }
+  end  
+  
+  
   def to_points
     return make_curvepoint_array(0.3)
   end
@@ -213,6 +232,10 @@ class Stroke
   
   def to_sexp
     return "( " + @command_list.inject("") {|result,element| result + element.to_sexp} + ")"
+  end
+  
+  def to_xml
+    "<stroke>\n" + @command_list.inject("") {|result,element| result + element.to_xml} + "</stroke>\n"
   end
   
   def to_points
@@ -303,6 +326,15 @@ class SVG_Character
     c += ") )"    
     return c
   
+  end
+  
+  def to_xml
+    c = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<character><utf8>"
+    c += @character
+    c += "</utf8><strokes>"
+    c += @strokes.inject("") {|result, stroke| result + stroke.to_xml}
+    c += "</strokes></character>"
+    return c  
   end
   
   def to_points
