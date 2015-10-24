@@ -10,7 +10,8 @@ To S-Expressions:
 SOURCE=kanjivg-RELEASENUMBER.xml ruby sexp_all_kanji.rb
 To csv files of the format: #stroke,x,y
 SOURCE=kanjivg-RELEASENUMBER.xml ruby csv_all_kanji.rb
-
+To tegaki xml format:
+SOURCE=kanjivg-RELEASENUMBER.xml ruby xml_all_kanji.rb
 License
 -------
 
