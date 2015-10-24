@@ -8,7 +8,7 @@ if ENV['SOURCE']
     #id has format: "kvg:kanji_CODEPOINT-Kaisho"
     #codepoint is a hex number
     codepoint = ("0x" + kanji.attributes["id"].value.split("_")[1].split("-")[0]).hex
-    strokes = kanji.xpath("g/path").map{|p| p.attributes["d"].value }
+    strokes = kanji.xpath("g//path").map{|p| p.attributes["d"].value }
     c = SVG_Character.new(codepoint, strokes)
     print c.to_sexp + "\n"
   end
