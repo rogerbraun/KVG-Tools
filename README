@@ -6,6 +6,11 @@ and strokes. Right now it only converts to pointy images in png, to
 S-Expressions and to single files in the Project Tegaki format. These can be used 
 to train zinnia (http://zinnia.sourceforge.net/) models and to evaluate these.
 
+Usage
+=====
+Download the xml release of the KanjiVG data at https://github.com/KanjiVG/kanjivg/releases.
+SOURCE=kanjivg-RELEASENUMBER.xml ruby sexp_all_kanji.rb
+
 License
 -------
 

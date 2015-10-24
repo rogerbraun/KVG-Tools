@@ -12,7 +12,8 @@ class Point
   end
   
   def to_sexp
-    return "( " + @x.to_s + " " + @y.to_s + " )";
+    #round to 2 decimal places
+    return "( " + @x.round(2).to_s + " " + @y.round(2).to_s + " )";
   end
   
   #Basic point arithmetics
@@ -300,26 +301,18 @@ class Stroke
 
 end
 
-# SVG_Character represents a whole character. It takes one argument, which
-# is a string of one line of kanjisstrokes.txt, or at least a line in that
-# format.
-# The format is like this:
-# Strokes are split by a ;
-# The first character is the kanji, followed by a whitespace
-#   
+# SVG_Character represents a whole character. It takes 2 arguments:
+# Codepoint is a hex number
+# Strokes are svg commands stored in an array
 class SVG_Character
     
-  def initialize(line)
-    # Splits the line into the kanji character, which is then put into 
-    # @character and the rest of the line.
-    @character,rest = line.split(" ");
-    @strokes = split_strokes(rest).map {|stroke| Stroke.new(stroke)}
+  def initialize(codepoint, strokes)
+    @codepoint = codepoint
+    #convert unicode codepoint to string character
+    @character = [@codepoint].pack("U")
+    @strokes = strokes.map{ |stroke| Stroke.new(stroke) }
   end
     
-  def split_strokes(line)
-    return line.split(";")
-  end
-  
   def to_sexp
     c = "(character (value " + @character +") (width 109) (height 109) (strokes "
     c = @strokes.inject(c) {|result, stroke| result + stroke.to_sexp}
