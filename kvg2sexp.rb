@@ -37,11 +37,11 @@ class Point
     "x:" + @x.to_s + " y:" + @y.to_s + "\n"
   end
   
-  #to array
-  def to_a
-    [@x.round(2), @y.round(2)]
-  end
   
+  
+  def to_xml
+    "<point x=\"" + (@x * 1000 / 109).to_s + "\" y=\"" + (@y * 1000 / 109).to_s + "\"/>"  
+  end
 end  
 
 
@@ -69,6 +69,10 @@ class SVG_M
   
   def current_cursor
     return @p
+  end
+  
+  def to_xml
+    ""
   end
   
 end
@@ -168,6 +172,14 @@ class SVG_C
     }
   end
   
+  def to_xml
+    curve_array = to_points
+    
+    return curve_array.inject("") {|result, element|
+      result + "\t" + element.to_xml + "\n"
+    }
+  end  
+  
   
   def to_points
     return make_curvepoint_array(0.3)
@@ -223,14 +235,12 @@ class Stroke
     return "( " + @command_list.inject("") {|result,element| result + element.to_sexp} + ")"
   end
   
+  def to_xml
+    "<stroke>\n" + @command_list.inject("") {|result,element| result + element.to_xml} + "</stroke>\n"
+  end
+  
   def to_points
     return @command_list.map{|element| element.to_points}.flatten
-  end
-
-  #to array
-  #TODO: better implementation using composite pattern
-  def to_a
-    to_points.map{|point| point.to_a}
   end
   
   def split_elements(line)
@@ -295,7 +305,6 @@ end
 # Codepoint is a hex number
 # Strokes are svg commands stored in an array
 class SVG_Character
-  attr_accessor :codepoint, :strokes, :character
     
   def initialize(codepoint, strokes)
     @codepoint = codepoint
@@ -310,6 +319,15 @@ class SVG_Character
     c += ") )"    
     return c
   
+  end
+  
+  def to_xml
+    c = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<character><utf8>"
+    c += @character
+    c += "</utf8><strokes>"
+    c += @strokes.inject("") {|result, stroke| result + stroke.to_xml}
+    c += "</strokes></character>"
+    return c  
   end
   
   def to_points
