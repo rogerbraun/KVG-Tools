@@ -37,6 +37,10 @@ class Point
     "x:" + @x.to_s + " y:" + @y.to_s + "\n"
   end
   
+  #to array
+  def to_a
+    [@x.round(2), @y.round(2)]
+  end
   
   
   def to_xml
@@ -243,6 +247,12 @@ class Stroke
     return @command_list.map{|element| element.to_points}.flatten
   end
   
+  #to array
+  #TODO: better implementation using composite pattern
+  def to_a
+    to_points.map{|point| point.to_a}
+  end
+
   def split_elements(line)
     # This is magic.
     return line.gsub("-",",-").gsub("s",",s,").gsub("S",",S,").gsub("c",",c,").gsub("C",",C,").gsub("M","M,").gsub("[","").gsub(";",",;,").gsub(",,",",").split(/,/);
