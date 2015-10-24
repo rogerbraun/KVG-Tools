@@ -11,7 +11,7 @@ if ENV['SOURCE']
     #id has format: "kvg:kanji_CODEPOINT-Kaisho"
     #filename = CODEPOINT or CODEPOINT-Kaisho
     filename = kanji.attributes["id"].value.split("_")[1]
-    strokes = kanji.xpath("g/path").map{|p| p.attributes["d"].value }
+    strokes = kanji.xpath("g//path").map{|p| p.attributes["d"].value }
 
     #stroke in the format [[x1, y1], [x2, y2] ...]
     strokes = strokes.map{ |stroke| Stroke.new(stroke).to_a }
