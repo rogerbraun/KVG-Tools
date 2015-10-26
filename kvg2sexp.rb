@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # kvg2sexp.rb
 
-
 #A Point
 class Point
   
@@ -230,6 +229,7 @@ end
 
 # Stroke represent one stroke, which is a series of SVG commands.
 class Stroke
+  COMMANDS = ["M", "C", "c", "s", "S"]
 
   def initialize(stroke_as_code)
     @command_list = parse(stroke_as_code) 
@@ -255,14 +255,14 @@ class Stroke
 
   def split_elements(line)
     # This is magic.
-    return line.gsub("-",",-").gsub("s",",s,").gsub("S",",S,").gsub("c",",c,").gsub("C",",C,").gsub("M","M,").gsub("[","").gsub(";",",;,").gsub(",,",",").split(/,/);
+    return line.gsub("-",",-").gsub("s",",s,").gsub("S",",S,").gsub("c",",c,").gsub("C",",C,").gsub("M","M,").gsub("[","").gsub(";",",;,").gsub(",,",",").gsub(" ,", ",").gsub(", ", ",").gsub(" ", ",").split(/,/);
   end
   
   def parse(stroke_as_code)
     elements = split_elements(stroke_as_code)    
     command_list = Array.new
     current_cursor = Point.new(0,0);
-    
+
     while elements != [] do
 
       case elements.slice!(0)
@@ -277,12 +277,21 @@ class Stroke
           c = SVG_C.new(Point.new(x1.to_f,y1.to_f), Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor)
           current_cursor = c.current_cursor
           command_list.push(c)    
-          
+
+          #handle polybezier
+          unless elements.empty? || COMMANDS.include?(elements.first)
+            elements.unshift("C")
+          end
         when "c"
           x1,y1,x2,y2,x,y = elements.slice!(0..5)
           c = SVG_C.relative(Point.new(x1.to_f,y1.to_f), Point.new(x2.to_f,y2.to_f), Point.new(x.to_f,y.to_f), current_cursor)
           current_cursor = c.current_cursor      
           command_list.push(c)     
+          
+          #handle polybezier
+          unless elements.empty? || COMMANDS.include?(elements.first)
+            elements.unshift("c")
+          end
            
         when "s"
           x2,y2,x,y = elements.slice!(0..3)
@@ -300,6 +309,7 @@ class Stroke
               
         else 
           #print "You should not be here\n"
+
       
       end
       
