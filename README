@@ -1,11 +1,17 @@
 kvg-tools
 =========
 
-These are tools for converting the KanjiVG data at kanjivg.tagaini.net to points
-and strokes. Right now it only converts to pointy images in png, to 
-S-Expressions and to single files in the Project Tegaki format. These can be used 
-to train zinnia (http://zinnia.sourceforge.net/) models and to evaluate these.
+These are tools for converting the KanjiVG data at kanjivg.tagaini.net to points and strokes. Right now it only converts to pointy images in png, to S-Expressions and to single files in the Project Tegaki format. These can be used to train zinnia (http://zinnia.sourceforge.net/) models and other machine learning engines.
 
+Usage
+=====
+Download the xml release of the KanjiVG data at https://github.com/KanjiVG/kanjivg/releases.
+To S-Expressions:
+SOURCE=kanjivg-RELEASENUMBER.xml ruby sexp_all_kanji.rb
+To csv files of the format: #stroke,x,y
+SOURCE=kanjivg-RELEASENUMBER.xml ruby csv_all_kanji.rb
+To tegaki xml format:
+SOURCE=kanjivg-RELEASENUMBER.xml ruby xml_all_kanji.rb
 License
 -------
 
